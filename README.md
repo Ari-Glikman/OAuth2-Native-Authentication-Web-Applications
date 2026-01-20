@@ -132,7 +132,7 @@ Method Authenticate(claims <span class="hljs-keyword">As</span> <span class="hlj
 
 <p>Finally, on your Web Application definition, select <strong>OAuth2</strong> as an allowed authentication method. The dispatch class will check that the client has the necessary roles.</p>
 
-<img width="1600" height="998" alt="image" src="https://github.com/user-attachments/assets/30636904-1b50-43be-99c7-3abcb6a26918" />
+<img width="598" height="364" alt="image" src="https://github.com/user-attachments/assets/7d4b5be2-6e71-4e26-9115-301237743087" />
 
 <h3>Step 6: Test it out</h3>
 <p>At this point, requests to your application can be authorized based on the presented token — so you can allow read-only access to <code>/checkbalance</code>&nbsp;while denying access to <code>/transfer</code> using the OAuth2 framework.</p>
