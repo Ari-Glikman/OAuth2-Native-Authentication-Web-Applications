@@ -1,0 +1,179 @@
+{
+  "realm": "bank",
+  "enabled": true,
+  "displayName": "Bank Demo Realm",
+  "sslRequired": "none",
+  "users": [
+    {
+      "username": "user1",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "123",
+          "temporary": false
+        }
+      ],
+      "email": "user1@example.com",
+      "firstName": "User1",
+      "lastName": "Demo",
+      "emailVerified": true
+    },
+    {
+      "username": "user2",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "123",
+          "temporary": false
+        }
+      ],
+      "email": "user2@example.com",
+      "firstName": "User2",
+      "lastName": "Demo",
+      "emailVerified": true
+    }
+  ],
+  "clients": [
+    {
+      "clientId": "bank-demo",
+      "name": "Bank Demo (Postman)",
+      "enabled": true,
+      "publicClient": true,
+      "protocol": "openid-connect",
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "redirectUris": [
+        "https://oauth.pstmn.io/v1/callback",
+        "http://localhost/*"
+      ],
+      "webOrigins": [
+        "*"
+      ],
+      "attributes": {
+        "pkce.code.challenge.method": "S256"
+      },
+      "protocolMappers": [
+        {
+          "name": "bank-demo-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "consentRequired": false,
+          "config": {
+            "included.client.audience": "bank-demo",
+            "access.token.claim": "true",
+            "id.token.claim": "false",
+            "introspection.token.claim": "true"
+          }
+        },
+        {
+          "name": "bank-demo-preferred-username",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-property-mapper",
+          "consentRequired": false,
+          "config": {
+            "userinfo.token.claim": "true",
+            "user.attribute": "username",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "preferred_username",
+            "jsonType.label": "String"
+          }
+        }
+      ],
+      "defaultClientScopes": [
+        "web-origins",
+        "profile",
+        "email",
+        "roles",
+        "bank.balance.read"
+      ],
+      "optionalClientScopes": [
+        "bank.transfer.write"
+      ]
+    },
+    {
+      "clientId": "bank-monitor",
+      "name": "Bank Monitor (3rd party, read-only)",
+      "enabled": true,
+      "publicClient": true,
+      "protocol": "openid-connect",
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "redirectUris": [
+        "https://oauth.pstmn.io/v1/callback",
+        "http://localhost/*"
+      ],
+      "webOrigins": [
+        "*"
+      ],
+      "attributes": {
+        "pkce.code.challenge.method": "S256"
+      },
+      "protocolMappers": [
+        {
+          "name": "bank-monitor-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "consentRequired": false,
+          "config": {
+            "included.client.audience": "bank-monitor",
+            "access.token.claim": "true",
+            "id.token.claim": "false",
+            "introspection.token.claim": "true"
+          }
+        },
+        {
+          "name": "bank-monitor-preferred-username",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-property-mapper",
+          "consentRequired": false,
+          "config": {
+            "userinfo.token.claim": "true",
+            "user.attribute": "username",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "preferred_username",
+            "jsonType.label": "String"
+          }
+        }
+      ],
+      "defaultClientScopes": [
+        "web-origins",
+        "profile",
+        "email",
+        "roles",
+        "bank.balance.read"
+      ],
+      "optionalClientScopes": []
+    }
+  ],
+  "attributes": {
+    "frontendUrl": "http://keycloak:8080/keycloak"
+  },
+  "clientScopes": [
+    {
+      "id": "c214411c-790a-4030-8254-a04b78656f28",
+      "name": "bank.balance.read",
+      "description": "Allows reading account balance",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "false"
+      },
+      "protocolMappers": []
+    },
+    {
+      "id": "22bd4e18-8094-41b0-afdc-c8d039c7a060",
+      "name": "bank.transfer.write",
+      "description": "Allows transferring funds",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "false"
+      },
+      "protocolMappers": []
+    }
+  ]
+}

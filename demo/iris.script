@@ -1,0 +1,48 @@
+zn "%SYS"
+do ##class(Security.Users).UnExpireUserPasswords("*")
+
+; Run-once guard: compile/seed/grants/webapp only on first startup
+if $data(^BankDemoSetup("Installed")) write "Bank demo already installed - skipping setup",! halt
+
+write "Installing Bank OAuth2 demo (first startup)...",!
+
+; ---- Create /bank web application (OAuth2 is configured in the portal)
+set app="/bank"
+kill props
+set props("Type")=2
+set props("NameSpace")="USER"
+set props("Enabled")=1
+set props("DispatchClass")="Bank.REST"
+set props("AutheEnabled")=32  ; Password auth enabled by default (OAuth2 is configured in the portal)
+set props("Description")="Bank API demo"
+set props("CookiePath")=app
+if ##class(Security.Applications).Exists(app) set sc=##class(Security.Applications).Delete(app)
+set sc=##class(Security.Applications).Create(app,.props) do $SYSTEM.Status.DisplayError(sc)
+write !,"== Web app ready: ",app,!
+
+; ---- Create roles if missing (with correct %DB_USER permissions)
+set rh=0, st=""
+set ex=##class(Security.Roles).Exists("BankBalanceRead", .rh, .st)
+if 'ex do $SYSTEM.Status.DisplayError(##class(Security.Roles).Create("BankBalanceRead","Bank demo: read balance","%DB_USER:R","",0))
+set ex=##class(Security.Roles).Exists("BankTransferWrite", .rh, .st)
+if 'ex do $SYSTEM.Status.DisplayError(##class(Security.Roles).Create("BankTransferWrite","Bank demo: transfer funds","%DB_USER:W","",0))
+
+; ---- Load/compile classes and seed data in USER
+zn "USER"
+do $SYSTEM.OBJ.LoadDir("/tmp/src/Bank","ck")
+set sc=##class(Bank.Seed).Ensure() do $SYSTEM.Status.DisplayError(sc)
+
+; ---- Apply table-level SQL privileges (dynamic SQL, not &sql)
+set sql="GRANT SELECT ON Bank.BankAccount TO BankBalanceRead"
+set stmt=##class(%SQL.Statement).%New()
+set sc=stmt.%Prepare(sql) do $SYSTEM.Status.DisplayError(sc) if $SYSTEM.Status.IsOK(sc) do stmt.%Execute()
+
+set sql="GRANT SELECT, UPDATE ON Bank.BankAccount TO BankTransferWrite"
+set stmt=##class(%SQL.Statement).%New()
+set sc=stmt.%Prepare(sql) do $SYSTEM.Status.DisplayError(sc) if $SYSTEM.Status.IsOK(sc) do stmt.%Execute()
+
+; ---- Mark installed
+zn "%SYS"
+set ^BankDemoSetup("Installed")=1
+write "== Setup complete: ",app,!
+halt

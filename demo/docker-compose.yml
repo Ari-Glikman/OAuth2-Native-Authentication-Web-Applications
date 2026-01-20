@@ -1,0 +1,39 @@
+services:
+  iris:
+    init: true
+    container_name: iris
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - ISC_DATA_DIRECTORY=/shared/durable
+    command: ["--after","/tmp/after.sh"]
+    ports:
+      - "52773:52773"
+      - "1972:1972"
+    volumes:
+      - ./shared:/shared
+    networks: [demo]
+    depends_on: [keycloak]
+    restart: unless-stopped
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0.5
+    container_name: keycloak
+    command: ["start-dev","--import-realm","--http-relative-path=/keycloak"]
+    environment:
+      KEYCLOAK_ADMIN: "admin"
+      KEYCLOAK_ADMIN_PASSWORD: "admin"
+      KC_HOSTNAME: "keycloak"
+      KC_HOSTNAME_PORT: "8080"
+      KC_HOSTNAME_STRICT: "false"
+      KC_HOSTNAME_STRICT_HTTPS: "false"
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./keycloak/realm-bank.json:/opt/keycloak/data/import/realm-bank.json:ro
+    networks: [demo]
+    restart: unless-stopped
+
+networks:
+  demo: {}

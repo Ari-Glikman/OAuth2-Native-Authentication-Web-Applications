@@ -1,0 +1,374 @@
+{
+  "info": {
+    "_postman_id": "889f7ba6-7bef-4a11-a828-2780cbd02231",
+    "name": "IRIS Bank OAuth2 Demo (Best Practice: Authorization Code + PKCE)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "This collection demonstrates OAuth2 Authorization Code + PKCE with Keycloak and IRIS, using 2 clients:\n- bank-monitor (read-only): scope includes bank.balance.read\n- bank-demo (read+write): scope includes bank.balance.read + bank.transfer.write\n\nHow to run:\n1) Import this collection and the provided environment.\n2) In Keycloak, for EACH client (bank-monitor, bank-demo) set:\n   - Standard flow: ON\n   - Proof Key for Code Exchange (PKCE): S256\n   - Valid Redirect URIs: include the Postman callback URL in the env (default https://oauth.pstmn.io/v1/callback)\n3) For any request, open the Authorization tab (OAuth 2.0) and click 'Get New Access Token'.\n   Postman will open a browser for login; your app never sees the password.\n4) Send requests. Read-only should succeed on /checkbalance and fail (403) on /transfer.\n"
+  },
+  "item": [
+    {
+      "name": "Monitor client (READ only)",
+      "item": [
+        {
+          "name": "01 - Check balance (READ token) - should be 200",
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                {
+                  "key": "addTokenTo",
+                  "value": "header",
+                  "type": "string"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "authorization_code_with_pkce",
+                  "type": "string"
+                },
+                {
+                  "key": "authUrl",
+                  "value": "{{keycloak_auth_url}}",
+                  "type": "string"
+                },
+                {
+                  "key": "accessTokenUrl",
+                  "value": "{{keycloak_token_url}}",
+                  "type": "string"
+                },
+                {
+                  "key": "clientId",
+                  "value": "{{monitor_client_id}}",
+                  "type": "string"
+                },
+                {
+                  "key": "redirect_uri",
+                  "value": "{{postman_callback_url}}",
+                  "type": "string"
+                },
+                {
+                  "key": "scope",
+                  "value": "{{monitor_scope}}",
+                  "type": "string"
+                },
+                {
+                  "key": "client_authentication",
+                  "value": "none",
+                  "type": "string"
+                },
+                {
+                  "key": "pkce",
+                  "value": "true",
+                  "type": "string"
+                },
+                {
+                  "key": "pkceMethod",
+                  "value": "S256",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{iris_base_url}}{{bank_api_prefix}}/checkbalance",
+            "description": "Uses Authorization Code + PKCE with bank-monitor. Expected: HTTP 200."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Expected 200', function () {",
+                  "  pm.expect(pm.response.code).to.eql(200);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "02 - Transfer (READ token) - should be 403",
+          "request": {
+            "method": "POST",
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                {
+                  "key": "addTokenTo",
+                  "value": "header",
+                  "type": "string"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "authorization_code_with_pkce",
+                  "type": "string"
+                },
+                {
+                  "key": "authUrl",
+                  "value": "{{keycloak_auth_url}}",
+                  "type": "string"
+                },
+                {
+                  "key": "accessTokenUrl",
+                  "value": "{{keycloak_token_url}}",
+                  "type": "string"
+                },
+                {
+                  "key": "clientId",
+                  "value": "{{monitor_client_id}}",
+                  "type": "string"
+                },
+                {
+                  "key": "redirect_uri",
+                  "value": "{{postman_callback_url}}",
+                  "type": "string"
+                },
+                {
+                  "key": "scope",
+                  "value": "{{monitor_scope}}",
+                  "type": "string"
+                },
+                {
+                  "key": "client_authentication",
+                  "value": "none",
+                  "type": "string"
+                },
+                {
+                  "key": "pkce",
+                  "value": "true",
+                  "type": "string"
+                },
+                {
+                  "key": "pkceMethod",
+                  "value": "S256",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"toAccount\": \"ACCT-2\",\n  \"dollars\": 2\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{iris_base_url}}{{bank_api_prefix}}/transfer",
+            "description": "Uses Authorization Code + PKCE with bank-monitor. Expected: HTTP 403 (missing write scope)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Expected 403', function () {",
+                  "  pm.expect(pm.response.code).to.eql(403);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Demo client (READ + WRITE)",
+      "item": [
+        {
+          "name": "03 - Check balance (WRITE token) - should be 200",
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                {
+                  "key": "addTokenTo",
+                  "value": "header",
+                  "type": "string"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "authorization_code_with_pkce",
+                  "type": "string"
+                },
+                {
+                  "key": "authUrl",
+                  "value": "{{keycloak_auth_url}}",
+                  "type": "string"
+                },
+                {
+                  "key": "accessTokenUrl",
+                  "value": "{{keycloak_token_url}}",
+                  "type": "string"
+                },
+                {
+                  "key": "clientId",
+                  "value": "{{demo_client_id}}",
+                  "type": "string"
+                },
+                {
+                  "key": "redirect_uri",
+                  "value": "{{postman_callback_url}}",
+                  "type": "string"
+                },
+                {
+                  "key": "scope",
+                  "value": "{{demo_scope}}",
+                  "type": "string"
+                },
+                {
+                  "key": "client_authentication",
+                  "value": "none",
+                  "type": "string"
+                },
+                {
+                  "key": "pkce",
+                  "value": "true",
+                  "type": "string"
+                },
+                {
+                  "key": "pkceMethod",
+                  "value": "S256",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{iris_base_url}}{{bank_api_prefix}}/checkbalance",
+            "description": "Uses Authorization Code + PKCE with bank-demo. Expected: HTTP 200."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Expected 200', function () {",
+                  "  pm.expect(pm.response.code).to.eql(200);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "04 - Transfer (WRITE token) - should be 200",
+          "request": {
+            "method": "POST",
+            "auth": {
+              "type": "oauth2",
+              "oauth2": [
+                {
+                  "key": "addTokenTo",
+                  "value": "header",
+                  "type": "string"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "authorization_code_with_pkce",
+                  "type": "string"
+                },
+                {
+                  "key": "authUrl",
+                  "value": "{{keycloak_auth_url}}",
+                  "type": "string"
+                },
+                {
+                  "key": "accessTokenUrl",
+                  "value": "{{keycloak_token_url}}",
+                  "type": "string"
+                },
+                {
+                  "key": "clientId",
+                  "value": "{{demo_client_id}}",
+                  "type": "string"
+                },
+                {
+                  "key": "redirect_uri",
+                  "value": "{{postman_callback_url}}",
+                  "type": "string"
+                },
+                {
+                  "key": "scope",
+                  "value": "{{demo_scope}}",
+                  "type": "string"
+                },
+                {
+                  "key": "client_authentication",
+                  "value": "none",
+                  "type": "string"
+                },
+                {
+                  "key": "pkce",
+                  "value": "true",
+                  "type": "string"
+                },
+                {
+                  "key": "pkceMethod",
+                  "value": "S256",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"toAccount\": \"ACCT-2\",\n  \"dollars\": 2\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{iris_base_url}}{{bank_api_prefix}}/transfer",
+            "description": "Uses Authorization Code + PKCE with bank-demo. Expected: HTTP 200."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Expected 200', function () {",
+                  "  pm.expect(pm.response.code).to.eql(200);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
