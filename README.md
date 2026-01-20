@@ -53,20 +53,29 @@
 <p>In the Management Portal, go to:</p>
 <p><em>System Administration &gt; Security &gt; OAuth 2.0 &gt; Client</em></p>
 <p>Click <em>Create Server Description</em>, set the Issuer URL (in the demo: <code>http://keycloak:8080/keycloak/realms/bank</code>), then click <em>Discover</em> and <em>Save</em>. IRIS will pull the endpoints and metadata it needs from the server (authorization endpoint, token endpoint, JWKS URI, etc.).</p>
-<p><img horiginal="294" src="/sites/default/files/inline/images/images/image(12552).png" woriginal="827"></p>
-<h3><img height="927" horiginal="1198" src="/sites/default/files/inline/images/images/image(12553).png" width="874" woriginal="1129"></h3>
+
+<img width="827" height="294" alt="image" src="https://github.com/user-attachments/assets/84647408-de60-49d2-bc32-cae96a73b7ca" />
+
+<img width="1129" height="1198" alt="image" src="https://github.com/user-attachments/assets/706ee564-557b-4f31-a2ff-fe2006a0a40a" />
+
 <h3>Step 3: Configure IRIS as the Resource Server</h3>
 <p>Next, create a Resource Server entry so IRIS can validate tokens and enforce permissions:</p>
-<p><img horiginal="170" src="/sites/default/files/inline/images/images/image(12554).png" woriginal="633"></p>
+
+<img width="633" height="170" alt="image" src="https://github.com/user-attachments/assets/ef699a85-0c2b-49b8-9ab6-0a91f8e466c2" />
+
 <p>Click <em>Create Resource Server</em>:</p>
-<p><img horiginal="313" src="/sites/default/files/inline/images/images/image(12493).png" woriginal="853"></p>
+
+<img width="853" height="313" alt="image" src="https://github.com/user-attachments/assets/618afeaf-4c79-4d8d-be49-e2d5034f9fc5" />
+
 <p>Fill in the details of your resource server, for example:</p>
 <p>Name: IRIS Bank Resource Server</p>
 <p>Server Definition:&nbsp;<code>http://keycloak:8080/keycloak/realms/bank</code></p>
 <p>Audiences: bank-demo, bank-monitor</p>
 <p><strong>What is “Audience”?</strong> The token’s audience (<code>aud</code>) is the “intended recipient” of the token. By configuring audiences here, you are telling IRIS to accept only tokens that were issued for this API (i.e., tokens whose <code>aud</code> matches one of these values).</p>
 <p>Click save.</p>
-<p><img horiginal="746" src="/sites/default/files/inline/images/images/image(12597).png" woriginal="710"></p>
+
+<img width="710" height="746" alt="image" src="https://github.com/user-attachments/assets/b91e47bb-0fa9-4d8d-8497-f94588547216" />
+
 <p>We will set the Authenticator class in the next step. Note that this is not strictly necessary; you could use the <a href="https://docs.intersystems.com/irislatest/csp/documatic/%25CSP.Documatic.cls?LIBRARY=%25SYS&amp;CLASSNAME=%25OAuth2.ResourceServer.SimpleAuthenticator" target="_blank">%OAuth2.ResourceServer.SimpleAuthenticator</a> in your own implementations and just fill in what token property should be attributed to the role and user. However, for the sake of completeness we will create a simple custom authenticator class.</p>
 <h3>Step 4: Create your Authenticator Class</h3>
 <p>What should be authenticated? We will create a simple class <code>Bank.Authenticator</code> that maps token claims/scopes into an IRIS username and IRIS roles.</p>
@@ -107,30 +116,50 @@ Method Authenticate(claims <span class="hljs-keyword">As</span> <span class="hlj
 }
 </code></pre>
 <p>Once you compile the class you will be able to set your authenticator class in your resource server:</p>
-<p><img horiginal="84" src="/sites/default/files/inline/images/images/image(12598).png" woriginal="596"></p>
+
+<img width="596" height="84" alt="image" src="https://github.com/user-attachments/assets/f1e9dff1-1928-451f-8c63-eb1198504dc6" />
+
 <p>Save your resource server.</p>
 <h3>Step 5: Enable OAuth2 on the Web Application</h3>
 <p>Before enabling OAuth2 for a web app, you must enable it at the System level:</p>
 <p><em>System Administration &gt; Security &gt; System Security &gt; Authentication/Web Session Options</em></p>
-<p><img height="550" horiginal="1077" src="/sites/default/files/inline/images/images/image(12555).png" width="744" woriginal="1455"></p>
+
+<img width="1455" height="1077" alt="image" src="https://github.com/user-attachments/assets/6de36293-f22d-4bd8-b416-3167ddb537c1" />
+
 <p>Finally, on your Web Application definition, select <strong>OAuth2</strong> as an allowed authentication method. The dispatch class will check that the client has the necessary roles.</p>
-<p><img horiginal="1158" src="/sites/default/files/inline/images/images/image(12560).png" woriginal="1856"></p>
+
+<img width="1600" height="998" alt="image" src="https://github.com/user-attachments/assets/30636904-1b50-43be-99c7-3abcb6a26918" />
+
 <h3>Step 6: Test it out</h3>
 <p>At this point, requests to your application can be authorized based on the presented token — so you can allow read-only access to <code>/checkbalance</code>&nbsp;while denying access to <code>/transfer</code> using the OAuth2 framework.</p>
 <p>Load the Postman collection and environment. There are two demo users/passwords to have in mind: <code>user1/123</code> and <code>user2/123</code>.</p>
 <p>User 1 has account <code>ACCT-1</code>, User 2 has account <code>ACCT-2</code>.</p>
-<p><img horiginal="285" src="/sites/default/files/inline/images/images/image(12599).png" woriginal="542"></p>
+
+<img width="542" height="285" alt="image" src="https://github.com/user-attachments/assets/877cafd7-4fac-4db7-994c-81bdb99e0be1" />
+
 <p>In Postman, on Authorization click <em>Get New Access Token</em>:</p>
-<p><img horiginal="843" src="/sites/default/files/inline/images/images/image(12600).png" woriginal="1623"></p>
+
+<img width="1600" height="831" alt="image" src="https://github.com/user-attachments/assets/8731675b-6b44-46e1-9222-3e8f16aba3ff" />
+
 <p>This brings up the login screen for our Authorization Server:</p>
-<p><img horiginal="607" src="/sites/default/files/inline/images/images/image(12601).png" woriginal="1179"></p>
+
+<img width="1179" height="607" alt="image" src="https://github.com/user-attachments/assets/68224369-517e-47e4-ac80-edd2e4118828" />
+
 <p>Log in with <code>user1/123</code>. Click proceed and then click <em>Use Token</em>.</p>
-<p><img horiginal="138" src="/sites/default/files/inline/images/images/image(12602).png" woriginal="710"></p>
+
+<img width="710" height="138" alt="image" src="https://github.com/user-attachments/assets/2083c912-0363-4743-a3eb-faa74aeb4eae" />
+
 <p>Send your GET to <code>/checkbalance</code>&nbsp;and you should see it return 5 dollars:</p>
-<p><img horiginal="709" src="/sites/default/files/inline/images/images/image(12603).png" woriginal="1763"></p>
+
+<img width="1600" height="643" alt="image" src="https://github.com/user-attachments/assets/1556f7a7-060a-4162-9ef6-f92aef65f667" />
+
 <p>Clear cookies and try logging in with user 2 and you should see them have 0 dollars in their balance.</p>
 <p>Now get a token for user 1 and try to transfer user 2 a couple dollars. It should fail with <strong>403 Forbidden</strong>&nbsp;as this “app” does not have the required scopes (it is only monitoring the bank account and should not be able to transfer money).</p>
-<p><img horiginal="422" src="/sites/default/files/inline/images/images/image(12604).png" woriginal="1041"></p>
+
+<img width="1041" height="422" alt="image" src="https://github.com/user-attachments/assets/c1b23c5b-f27e-4699-947a-e16621b211c8" />
+
 <p>Try again with requests 3 and 4 which simulate a client with full access and you should be able to both check your balance and transfer funds.</p>
-<p><img horiginal="412" src="/sites/default/files/inline/images/images/image(12606).png" woriginal="1033"></p>
+
+<img width="1033" height="412" alt="image" src="https://github.com/user-attachments/assets/be5dbdab-ef5e-47a1-a01d-26ca43943846" />
+
 <p>The new OAuth2 native authentication type ensures it is intuitive to keep your web applications safe, and after all, that's what the I in IRIS is all about.</p>
