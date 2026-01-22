@@ -3,12 +3,12 @@
 <p>OAuth2 focuses on <em>authorization</em> (what the client is allowed to do). If you also need user login and identity claims, OAuth2 is commonly paired with OpenID Connect (OIDC) — but in this article we’ll stay focused on OAuth2 access tokens and scopes.</p>
 <p>If you want a quick refresher, this short video is a good overview: <a href="https://learning.intersystems.com/course/view.php?id=252" target="_blank">OAuth 2.0 An Overview</a>.</p>
 <h3>The problem OAuth2 solves (with a simple IRIS example)</h3>
-<p>Assume IRIS hosts a small REST API for a bank account <code>ACCT-1</code> under <code>/myBankInfo</code>:</p>
-<p><strong>GET</strong><br><code>/myBankInfo/ACCT-1/checkbalance</code></p>
+<p>Assume IRIS hosts a small REST API for a bank account <code>ACCT-1</code> under <code>/bank</code>:</p>
+<p><strong>GET</strong><br><code>/bank/checkbalance</code></p>
 <pre class="codeblock-container" idlang="3" lang="JSON" tabsize="4"><code class="language-json hljs">{
   <span class="hljs-attr">"dollars"</span>: <span class="hljs-number">5</span>
 }</code></pre>
-<p><strong>POST</strong><br><code>/myBankInfo/ACCT-1/transfer</code></p>
+<p><strong>POST</strong><br><code>/bank/transfer</code></p>
 <pre class="codeblock-container" idlang="3" lang="JSON" tabsize="4"><code class="language-json hljs">{
   <span class="hljs-attr">"toAccount"</span>: <span class="hljs-string">"ACCT-2"</span>,
   <span class="hljs-attr">"dollars"</span>: <span class="hljs-number">2</span>
@@ -30,7 +30,7 @@
 <li><strong>Resource Owner</strong> (the user/owner of the bank account)</li>
 <li><strong>Client</strong> (the third-party app; in this demo we use Postman as the client)</li>
 <li><strong>Authorization Server</strong> (Keycloak; authenticates the user &amp; authorizes the request, deciding what scopes the client can receive, and issues the token)</li>
-<li><strong>Resource Server</strong> (IRIS; hosts <code>/myBankInfo</code>, validates the token, and enforces what the token is allowed to do). The third-party app never sees your IRIS password — it presents a token, and IRIS makes the allow/deny decision.</li>
+<li><strong>Resource Server</strong> (IRIS; hosts <code>/bank</code>, validates the token, and enforces what the token is allowed to do). The third-party app never sees your IRIS password — it presents a token, and IRIS makes the allow/deny decision.</li>
 </ul>
 <h3>Step 0: Prerequisites (avoid issuer / hostname issues)</h3>
 <p><strong>Note:</strong> This demo uses HTTP to keep setup simple. In production you should use HTTPS (and real certificates), otherwise tokens and sessions can be intercepted.</p>
