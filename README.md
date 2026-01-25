@@ -85,6 +85,8 @@
 <li>Your <strong>web application</strong> (and/or your REST endpoints) can require those roles.</li>
 </ul>
 <p>In other words, this is what makes <code>/checkbalance</code>&nbsp; succeed for a “monitor” token while <code>/transfer</code> returns <strong>403 Forbidden</strong> unless the token includes the transfer scope.</p>
+
+
 <pre class="codeblock-container" idlang="0" lang="ObjectScript" tabsize="4"><code class="language-cls hljs cos"><span class="hljs-keyword">Class</span> Bank.Authenticator <span class="hljs-keyword">Extends</span> <span class="hljs-built_in">%OAuth</span>2.ResourceServer.Authenticator
 {
 
@@ -115,7 +117,6 @@ Method Authenticate(claims <span class="hljs-keyword">As</span> <span class="hlj
 
 }
 </code></pre>
-
 
 <p>Once you compile the class you will be able to set your authenticator class in your resource server:</p>
 
