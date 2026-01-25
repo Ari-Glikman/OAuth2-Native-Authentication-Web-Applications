@@ -85,7 +85,6 @@
 <li>Your <strong>web application</strong> (and/or your REST endpoints) can require those roles.</li>
 </ul>
 <p>In other words, this is what makes <code>/checkbalance</code>&nbsp; succeed for a “monitor” token while <code>/transfer</code> returns <strong>403 Forbidden</strong> unless the token includes the transfer scope.</p>
-
 <pre class="codeblock-container" idlang="0" lang="ObjectScript" tabsize="4"><code class="language-cls hljs cos"><span class="hljs-keyword">Class</span> Bank.Authenticator <span class="hljs-keyword">Extends</span> <span class="hljs-built_in">%OAuth</span>2.ResourceServer.Authenticator
 {
 
@@ -102,21 +101,20 @@ Method Authenticate(claims <span class="hljs-keyword">As</span> <span class="hlj
     <span class="hljs-keyword">Set</span> scopeStr = claims.scope
     <span class="hljs-keyword">Set</span> roles = <span class="hljs-string">""</span>
     <span class="hljs-keyword">If</span> <span class="hljs-built_in">..HasScope</span>(scopeStr,<span class="hljs-string">"bank.balance.read"</span>) {
-        <span class="hljs-keyword">Set</span> roles = roles_<span class="hljs-string">",BankBalanceRead"</span>
+        <span class="hljs-keyword">Set</span> roles = roles_<span class="hljs-string">",BankBalanceRead,%DB_USER"</span>
     }
     <span class="hljs-keyword">If</span> <span class="hljs-built_in">..HasScope</span>(scopeStr,<span class="hljs-string">"bank.transfer.write"</span>) {
-        <span class="hljs-keyword">Set</span> roles = roles_<span class="hljs-string">",BankTransferWrite"</span>
+        <span class="hljs-keyword">Set</span> roles = roles_<span class="hljs-string">",BankTransferWrite,%DB_USER"</span>
     }
 
     <span class="hljs-keyword">If</span> <span class="hljs-built_in">$Extract</span>(roles,<span class="hljs-number">1</span>)=<span class="hljs-string">","</span> <span class="hljs-keyword">Set</span> roles=<span class="hljs-built_in">$Extract</span>(roles,<span class="hljs-number">2</span>,*)
     
-    <span class="hljs-keyword">Set</span> properties(<span class="hljs-string">"Roles"</span>) = roles_<span class="hljs-string">",%DB_USER"</span>
+    <span class="hljs-keyword">Set</span> properties(<span class="hljs-string">"Roles"</span>) = roles
     <span class="hljs-keyword">Quit</span> <span class="hljs-built_in">$$$OK</span>
 }
 
 }
 </code></pre>
-
 
 
 <p>Once you compile the class you will be able to set your authenticator class in your resource server:</p>
