@@ -1,5 +1,5 @@
-#!/bin/bash
-set -euo pipefail
+#!/bin/sh
+set -eu
 
 echo "[after.sh] Running post-start setup (compile + seed + users + web app)..."
 iris session IRIS < /tmp/iris.script
